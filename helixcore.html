@@ -3,72 +3,52 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-
-    <!-- model-viewer (free) -->
     <script type="module" src="https://unpkg.com/@google/model-viewer/dist/model-viewer.min.js"></script>
 
     <style>
-      html, body { height: 100%; }
-      body {
+      /* HARD RESET: no frame, no rounding, no shadow, transparent everywhere */
+      html, body {
+        width: 100%;
+        height: 100%;
         margin: 0;
-        display: grid;
-        place-items: center;
-        background: transparent;
-        font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
-      }
-      .wrap {
-        width: min(1100px, 96vw);
-        height: min(760px, 86vh);
-        border-radius: 18px;
+        padding: 0;
+        background: transparent !important;
         overflow: hidden;
-        box-shadow: 0 10px 30px rgba(0,0,0,.45);
-        background: transparent;
       }
-      model-viewer { width: 100%; height: 100%; }
+      model-viewer {
+        width: 100%;
+        height: 100%;
+        display: block;
+        background: transparent !important;
+        border: 0 !important;
+        border-radius: 0 !important;
+        box-shadow: none !important;
+        outline: none !important;
+        --poster-color: transparent;
+      }
     </style>
   </head>
 
   <body>
-    <div class="wrap">
-      <model-viewer
-        id="mv"
-        src="./models/helixcore.glb"
-        alt="3D model"
-        camera-controls
-        auto-rotate
-        exposure="1.0"
-        shadow-intensity="0.6"
-      ></model-viewer>
-    </div>
+    <model-viewer
+      id="mv"
+      src="./models/helixcore.glb"
+      camera-controls
+      auto-rotate
+      transparent-background
+      shadow-intensity="0"
+    ></model-viewer>
 
     <script type="module">
       const mv = document.querySelector("#mv");
 
-      // ====== SET YOUR COLOR HERE (RGBA values 0..1) ======
-      // Example below: bright red
-      const NEW_COLOR = [0.4, 0.4, 0.4, 0.5];
-
-      // Optional: choose a material by name (set to null to recolor all)
-      const TARGET_MATERIAL_NAME = null; // e.g. "Body"
+      // CHANGE ONLY THIS (RGBA 0..1)
+      const NEW_COLOR = [0, 0.6, 1, 1]; // example: light blue
 
       mv.addEventListener("load", () => {
         const mats = mv.model?.materials ?? [];
-        if (mats.length === 0) return;
-
-        const targets = TARGET_MATERIAL_NAME
-          ? mats.filter(m => m.name === TARGET_MATERIAL_NAME)
-          : mats; // recolor all materials
-
-        for (const mat of targets) {
-          const pbr = mat.pbrMetallicRoughness;
-          if (!pbr) continue;
-
-          // Set base color
-          pbr.setBaseColorFactor(NEW_COLOR);
-
-          // Optional tweaks (feel free to edit)
-          pbr.setMetallicFactor(0.0);
-          pbr.setRoughnessFactor(0.6);
+        for (const mat of mats) {
+          mat.pbrMetallicRoughness?.setBaseColorFactor(NEW_COLOR);
         }
       });
     </script>
