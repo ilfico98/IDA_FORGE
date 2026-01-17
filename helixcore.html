@@ -4,21 +4,73 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <!-- Load model-viewer -->
+    <!-- model-viewer (free) -->
     <script type="module" src="https://unpkg.com/@google/model-viewer/dist/model-viewer.min.js"></script>
 
     <style>
-      body { margin: 0; display: grid; place-items: center; height: 100vh; }
-      model-viewer { width: min(900px, 95vw); height: min(700px, 85vh); }
+      html, body { height: 100%; }
+      body {
+        margin: 0;
+        display: grid;
+        place-items: center;
+        background: #111;
+        font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+      }
+      .wrap {
+        width: min(1100px, 96vw);
+        height: min(760px, 86vh);
+        border-radius: 18px;
+        overflow: hidden;
+        box-shadow: 0 10px 30px rgba(0,0,0,.45);
+        background: #1a1a1a;
+      }
+      model-viewer { width: 100%; height: 100%; }
     </style>
   </head>
 
   <body>
-    <model-viewer
-      src="./models/helixcore.glb"
-      alt="3D model"
-      camera-controls
-      auto-rotate
-    ></model-viewer>
+    <div class="wrap">
+      <model-viewer
+        id="mv"
+        src="./models/helixcore.glb"
+        alt="3D model"
+        camera-controls
+        auto-rotate
+        exposure="1.0"
+        shadow-intensity="0.6"
+      ></model-viewer>
+    </div>
+
+    <script type="module">
+      const mv = document.querySelector("#mv");
+
+      // ====== SET YOUR COLOR HERE (RGBA values 0..1) ======
+      // Example below: bright red
+      const NEW_COLOR = [1, 0, 0, 1];
+
+      // Optional: choose a material by name (set to null to recolor all)
+      const TARGET_MATERIAL_NAME = null; // e.g. "Body"
+
+      mv.addEventListener("load", () => {
+        const mats = mv.model?.materials ?? [];
+        if (mats.length === 0) return;
+
+        const targets = TARGET_MATERIAL_NAME
+          ? mats.filter(m => m.name === TARGET_MATERIAL_NAME)
+          : mats; // recolor all materials
+
+        for (const mat of targets) {
+          const pbr = mat.pbrMetallicRoughness;
+          if (!pbr) continue;
+
+          // Set base color
+          pbr.setBaseColorFactor(NEW_COLOR);
+
+          // Optional tweaks (feel free to edit)
+          pbr.setMetallicFactor(0.0);
+          pbr.setRoughnessFactor(0.6);
+        }
+      });
+    </script>
   </body>
 </html>
